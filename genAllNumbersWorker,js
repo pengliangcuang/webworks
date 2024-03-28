@@ -1,0 +1,30 @@
+self.addEventListener('message', function(e) {
+    const formData = e.data.formData;
+    const NumberSegment = formData.NumberSegment.split(',');
+    const NumberLength = formData.NumberLength;
+    const EnableCountryCode = formData.EnableCountryCode;
+    const EnablePlus = formData.EnablePlus;
+    const countryCodes = formData.countryCodes;
+    const DisruptResults = formData.DisruptResults;
+
+    NumberSegment.forEach((item) => {
+        const result = [];
+        for (let i = 0; i < Math.pow(10, NumberLength - item.length); i++) {
+            let number = "";
+            if (EnableCountryCode && EnablePlus) {
+                number = `+${countryCodes}${item}${String(i).padStart(NumberLength - item.length, "0")}`;
+            } else if (EnableCountryCode) {
+                number = `${countryCodes}${item}${String(i).padStart(NumberLength - item.length, "0")}`;
+            } else {
+                number = `${item}${String(i).padStart(NumberLength - item.length, "0")}`;
+            }
+            result.push(number);
+        }
+
+        if (DisruptResults) {
+            result.sort(() => Math.random() - 0.5);
+        }
+
+        self.postMessage({ result, item });
+    });
+});
